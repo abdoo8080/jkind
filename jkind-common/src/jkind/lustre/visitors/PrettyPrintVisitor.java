@@ -6,38 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import jkind.lustre.ArrayAccessExpr;
-import jkind.lustre.ArrayExpr;
-import jkind.lustre.ArrayUpdateExpr;
-import jkind.lustre.BinaryExpr;
-import jkind.lustre.BoolExpr;
-import jkind.lustre.CastExpr;
-import jkind.lustre.CondactExpr;
-import jkind.lustre.Constant;
-import jkind.lustre.Contract;
-import jkind.lustre.EnumType;
-import jkind.lustre.Equation;
-import jkind.lustre.Expr;
-import jkind.lustre.Function;
-import jkind.lustre.FunctionCallExpr;
-import jkind.lustre.IdExpr;
-import jkind.lustre.IfThenElseExpr;
-import jkind.lustre.IntExpr;
-import jkind.lustre.NamedType;
-import jkind.lustre.Node;
-import jkind.lustre.NodeCallExpr;
-import jkind.lustre.Program;
-import jkind.lustre.RealExpr;
-import jkind.lustre.RecordAccessExpr;
-import jkind.lustre.RecordExpr;
-import jkind.lustre.RecordType;
-import jkind.lustre.RecordUpdateExpr;
-import jkind.lustre.TupleExpr;
-import jkind.lustre.Type;
-import jkind.lustre.TypeDef;
-import jkind.lustre.UnaryExpr;
-import jkind.lustre.UnaryOp;
-import jkind.lustre.VarDecl;
+import jkind.lustre.*;
 
 public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 	private StringBuilder sb = new StringBuilder();
@@ -81,6 +50,22 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		if (!program.functions.isEmpty()) {
 			for (Function function : program.functions) {
 				function.accept(this);
+				newline();
+			}
+			newline();
+		}
+
+		if (!program.contracts.isEmpty()) {
+			for (Contract contract : program.contracts) {
+				contract.accept(this);
+				newline();
+			}
+			newline();
+		}
+
+		if (!program.importedNodes.isEmpty()) {
+			for (ImportedNode importedNode : program.importedNodes) {
+				importedNode.accept(this);
 				newline();
 			}
 			newline();
@@ -181,8 +166,12 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		write(");");
 		newline();
 
-		if (node.contract != null) {
-			node.contract.accept(this);
+		if (node.contractBody != null) {
+			write("(*@contract");
+			newline();
+			node.contractBody.accept(this);
+			write("*)");
+			newline();
 		}
 
 		if (!node.locals.isEmpty()) {
@@ -239,6 +228,34 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		return null;
 	}
 
+	@Override
+	public Void visit(ImportedNode importedNode)
+	{
+		write("node imported ");
+		write(importedNode.id);
+		write("(");
+		newline();
+		varDecls(importedNode.inputs);
+		newline();
+		write(") returns (");
+		newline();
+		varDecls(importedNode.outputs);
+		newline();
+		write(");");
+		newline();
+
+		if (importedNode.contractBody != null)
+		{
+			write("(*@contract");
+			newline();
+			importedNode.contractBody.accept(this);
+			write("*)");
+			newline();
+		}
+
+		return null;
+	}
+
 	private void varDecls(List<VarDecl> varDecls) {
 		Iterator<VarDecl> iterator = varDecls.iterator();
 		while (iterator.hasNext()) {
@@ -256,6 +273,50 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		write(varDecl.id);
 		write(" : ");
 		write(varDecl.type);
+		return null;
+	}
+
+	@Override
+	public Void visit(VarDef varDef) {
+		write("var ");
+		varDef.varDecl.accept(this);
+		write(" = ");
+		expr(varDef.expr);
+		write(";");
+		return null;
+	}
+
+	@Override
+	public Void visit(ContractImport contractImport) {
+		write("import ");
+		write(contractImport.id);
+		write("(");
+
+		Iterator<Expr> inputIt = contractImport.inputs.iterator();
+
+		while (inputIt.hasNext())
+		{
+			expr(inputIt.next());
+			if (inputIt.hasNext())
+			{
+				write(", ");
+			}
+		}
+
+		write(") returns (");
+
+		Iterator<Expr> outputIt = contractImport.outputs.iterator();
+		while (outputIt.hasNext())
+		{
+			expr(outputIt.next());
+			if (outputIt.hasNext())
+			{
+				write(", ");
+			}
+		}
+
+		write(");");
+
 		return null;
 	}
 
@@ -295,6 +356,10 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 
 	public void expr(Expr e) {
 		e.accept(this);
+	}
+
+	public void item(ContractItem i) {
+		i.accept(this);
 	}
 
 	@Override
@@ -421,6 +486,16 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 	}
 
 	@Override
+	public Void visit(ModeRefExpr e) {
+		for (String s : e.path)
+		{
+			write("::");
+			write(s);
+		}
+		return null;
+	}
+
+	@Override
 	public Void visit(NodeCallExpr e) {
 		write(e.node);
 		write("(");
@@ -512,26 +587,71 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		return null;
 	}
 
-	@Override
-	public Void visit(Contract contract) {
-		newline();
-		write("(*@contract");
-		newline();
-		for (Expr expr : contract.requires) {
-			write("assume ");
-			expr(expr);
-			write(";");
-			newline();
-		}
-		for (Expr expr : contract.ensures) {
-			write("guarantee ");
-			expr(expr);
-			write(";");
-			newline();
-		}
-		write("*)");
-		newline();
+	public Void visit(Assume assumption) {
+		write("assume ");
+		expr(assumption.expr);
+		write(";");
 		return null;
 	}
 
+	public Void visit(Guarantee guarantee) {
+		write("guarantee ");
+		expr(guarantee.expr);
+		write(";");
+		return null;
+	}
+
+	public Void visit(Mode mode) {
+		write("mode ");
+		write(mode.id);
+		write(" (");
+		newline();
+		for (Expr e : mode.require)
+		{
+			write("    require ");
+			expr(e);
+			write(";");
+			newline();
+		}
+		for (Expr e : mode.ensure)
+		{
+			write("    ensure  ");
+			expr(e);
+			write(";");
+			newline();
+		}
+		write("  );");
+		return null;
+	}
+
+	@Override
+	public Void visit(ContractBody contractBody) {
+		for (ContractItem item : contractBody.items) {
+			write("  ");
+			item.accept(this);
+			newline();
+		}
+		return null;
+	}
+
+	@Override
+	public Void visit(Contract contract) {
+		write("contract ");
+		write(contract.id);
+		write("(");
+		newline();
+		varDecls(contract.inputs);
+		newline();
+		write(") returns (");
+		newline();
+		varDecls(contract.outputs);
+		newline();
+		write(");");
+		newline();
+		write("let");
+		newline();
+		visit(contract.contractBody);
+		write("tel;");
+		return null;
+	}
 }

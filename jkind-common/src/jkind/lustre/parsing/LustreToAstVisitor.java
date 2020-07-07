@@ -4,12 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -26,6 +21,7 @@ import jkind.lustre.CastExpr;
 import jkind.lustre.CondactExpr;
 import jkind.lustre.Constant;
 import jkind.lustre.Contract;
+import jkind.lustre.ContractBody;
 import jkind.lustre.EnumType;
 import jkind.lustre.Equation;
 import jkind.lustre.Expr;
@@ -109,7 +105,7 @@ public class LustreToAstVisitor extends LustreBaseVisitor<Object> {
 		List<Constant> constants = constants(ctx.constant());
 		List<Function> functions = functions(ctx.function());
 		List<Node> nodes = nodes(ctx.node());
-		return new Program(loc(ctx), types, constants, functions, nodes, main);
+		return new Program(loc(ctx), types, constants, null, functions, null, nodes, main);
 	}
 
 	private List<TypeDef> types(List<TypedefContext> ctxs) {
@@ -159,7 +155,7 @@ public class LustreToAstVisitor extends LustreBaseVisitor<Object> {
 		List<Expr> assertions = assertions(ctx.assertion());
 		List<String> ivc = ivc(ctx.ivc());
 		List<String> realizabilityInputs = realizabilityInputs(ctx.realizabilityInputs());
-		Contract contract = null;
+		ContractBody contractBody = null;
 		if (!ctx.main().isEmpty()) {
 			if (main == null) {
 				main = id;
@@ -168,7 +164,7 @@ public class LustreToAstVisitor extends LustreBaseVisitor<Object> {
 			}
 		}
 		return new Node(loc(ctx), id, inputs, outputs, locals, equations, properties, assertions, realizabilityInputs,
-				contract, ivc);
+                contractBody, ivc);
 	}
 
 	private List<VarDecl> varDecls(VarDeclListContext listCtx) {

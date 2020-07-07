@@ -6,24 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import jkind.lustre.ArrayAccessExpr;
-import jkind.lustre.ArrayExpr;
-import jkind.lustre.ArrayUpdateExpr;
-import jkind.lustre.BinaryExpr;
-import jkind.lustre.BoolExpr;
-import jkind.lustre.CastExpr;
-import jkind.lustre.CondactExpr;
-import jkind.lustre.Expr;
-import jkind.lustre.FunctionCallExpr;
-import jkind.lustre.IfThenElseExpr;
-import jkind.lustre.IntExpr;
-import jkind.lustre.NodeCallExpr;
-import jkind.lustre.RealExpr;
-import jkind.lustre.RecordAccessExpr;
-import jkind.lustre.RecordExpr;
-import jkind.lustre.RecordUpdateExpr;
-import jkind.lustre.TupleExpr;
-import jkind.lustre.UnaryExpr;
+import jkind.lustre.*;
 import jkind.lustre.values.ArrayValue;
 import jkind.lustre.values.BooleanValue;
 import jkind.lustre.values.IntegerValue;
@@ -124,6 +107,11 @@ public abstract class Evaluator implements ExprVisitor<Value> {
 	@Override
 	public Value visit(IntExpr e) {
 		return new IntegerValue(e.value);
+	}
+
+	@Override
+	public Value visit(ModeRefExpr e) {
+		return null;
 	}
 
 	@Override

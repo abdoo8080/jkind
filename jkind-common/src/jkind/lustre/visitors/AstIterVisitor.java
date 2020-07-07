@@ -2,15 +2,7 @@ package jkind.lustre.visitors;
 
 import java.util.List;
 
-import jkind.lustre.Constant;
-import jkind.lustre.Contract;
-import jkind.lustre.Equation;
-import jkind.lustre.Expr;
-import jkind.lustre.Function;
-import jkind.lustre.Node;
-import jkind.lustre.Program;
-import jkind.lustre.TypeDef;
-import jkind.lustre.VarDecl;
+import jkind.lustre.*;
 
 public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, Void> {
 	@Override
@@ -42,6 +34,13 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 		return null;
 	}
 
+	@Override
+	public Void visit(ImportedNode e) {
+		visitVarDecls(e.inputs);
+		visitVarDecls(e.outputs);
+		return null;
+	}
+
 	protected void visitVarDecls(List<VarDecl> es) {
 		for (VarDecl e : es) {
 			visit(e);
@@ -62,7 +61,9 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	public Void visit(Program e) {
 		visitTypeDefs(e.types);
 		visitConstants(e.constants);
+		// visitContracts(e.contracts);
 		visitFunctions(e.functions);
+		// visitImportedNodes(e.importedNodes);
 		visitNodes(e.nodes);
 		return null;
 	}
@@ -79,8 +80,20 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 		}
 	}
 
+	protected void visitContracts(List<Contract> es) {
+		for (Contract e : es) {
+			visit(e);
+		}
+	}
+
 	protected void visitFunctions(List<Function> es) {
 		for (Function e : es) {
+			visit(e);
+		}
+	}
+
+	protected void visitImportedNodes(List<ImportedNode> es) {
+		for (ImportedNode e : es) {
 			visit(e);
 		}
 	}
@@ -88,6 +101,12 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	protected void visitNodes(List<Node> es) {
 		for (Node e : es) {
 			visit(e);
+		}
+	}
+
+	protected void visitContractItems(List<ContractItem> es) {
+		for (ContractItem e : es) {
+			e.accept(this);
 		}
 	}
 
@@ -102,9 +121,48 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	}
 
 	@Override
+	public Void visit(VarDef varDef) {
+		varDef.expr.accept(this);
+		return null;
+	}
+
+	@Override
+	public Void visit(Assume assumption) {
+		assumption.expr.accept(this);
+		return null;
+	}
+
+	@Override
+	public Void visit(Guarantee guarantee) {
+		guarantee.expr.accept(this);
+		return null;
+	}
+
+	@Override
+	public Void visit(ContractImport contractImport) {
+		visitExprs(contractImport.inputs);
+		visitExprs(contractImport.outputs);
+		return null;
+	}
+
+	@Override
+	public Void visit(ContractBody contractBody) {
+		visitContractItems(contractBody.items);
+		return null;
+	}
+
+	@Override
+	public Void visit(Mode mode) {
+		visitExprs(mode.require);
+		visitExprs(mode.ensure);
+		return null;
+	}
+
+	@Override
 	public Void visit(Contract contract) {
-		visitExprs(contract.requires);
-		visitExprs(contract.ensures);
+		visitVarDecls(contract.inputs);
+		visitVarDecls(contract.outputs);
+		visit(contract.contractBody);
 		return null;
 	}
 }

@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import jkind.lustre.Constant;
-import jkind.lustre.Function;
-import jkind.lustre.Location;
-import jkind.lustre.Node;
-import jkind.lustre.Program;
-import jkind.lustre.TypeDef;
+import jkind.lustre.*;
 
 public class ProgramBuilder {
 	private List<TypeDef> types = new ArrayList<>();
 	private List<Constant> constants = new ArrayList<>();
+	private List<Contract> contracts = new ArrayList<>();
+	private List<ImportedNode> importedNodes = new ArrayList<>();
 	private List<Node> nodes = new ArrayList<>();
 	private List<Function> functions = new ArrayList<>();
 	private String main;
@@ -24,6 +21,8 @@ public class ProgramBuilder {
 	public ProgramBuilder(Program program) {
 		this.types = new ArrayList<>(program.types);
 		this.constants = new ArrayList<>(program.constants);
+		this.contracts = new ArrayList<>(program.contracts);
+		this.importedNodes = new ArrayList<>(program.importedNodes);
 		this.nodes = new ArrayList<>(program.nodes);
 		this.functions = new ArrayList<>(program.functions);
 		this.main = program.main;
@@ -56,6 +55,36 @@ public class ProgramBuilder {
 
 	public ProgramBuilder clearConstants() {
 		this.constants.clear();
+		return this;
+	}
+
+	public ProgramBuilder addContract(Contract contract) {
+		this.contracts.add(contract);
+		return this;
+	}
+
+	public ProgramBuilder addContracts(Collection<Contract> contracts) {
+		this.contracts.addAll(contracts);
+		return this;
+	}
+
+	public ProgramBuilder clearContracts() {
+		this.contracts.clear();
+		return this;
+	}
+
+	public ProgramBuilder addImportedNode(ImportedNode importedNode) {
+		this.importedNodes.add(importedNode);
+		return this;
+	}
+
+	public ProgramBuilder addImportedNodes(Collection<ImportedNode> importedNodes) {
+		this.importedNodes.addAll(importedNodes);
+		return this;
+	}
+
+	public ProgramBuilder clearImportedNodes() {
+		this.importedNodes.clear();
 		return this;
 	}
 
@@ -95,6 +124,6 @@ public class ProgramBuilder {
 	}
 
 	public Program build() {
-		return new Program(Location.NULL, types, constants, functions, nodes, main);
+		return new Program(Location.NULL, types, constants, contracts, functions, importedNodes, nodes, main);
 	}
 }

@@ -7,6 +7,7 @@ import jkind.lustre.visitors.PrettyPrintVisitor;
 public abstract class Ast {
 	public final Location location;
 
+
 	public Ast(Location location) {
 		Assert.isNotNull(location);
 		this.location = location;

@@ -1,20 +1,27 @@
 package jkind.lustre.visitors;
 
-import jkind.lustre.Constant;
-import jkind.lustre.Contract;
-import jkind.lustre.Equation;
-import jkind.lustre.Function;
-import jkind.lustre.Node;
-import jkind.lustre.Program;
-import jkind.lustre.TypeDef;
-import jkind.lustre.VarDecl;
+import jkind.lustre.*;
 
 public interface AstVisitor<T, S extends T> extends ExprVisitor<S> {
+	public T visit(Assume assumption);
+
+	public T visit(Contract contract);
+
+	public T visit(ContractBody contractBody);
+
+	public T visit(ContractImport contractImport);
+
 	public T visit(Constant constant);
 
 	public T visit(Equation equation);
 
 	public T visit(Function function);
+
+	public T visit(Guarantee guarantee);
+
+	public T visit(ImportedNode importedNode);
+
+	public T visit(Mode mode);
 
 	public T visit(Node node);
 
@@ -24,5 +31,5 @@ public interface AstVisitor<T, S extends T> extends ExprVisitor<S> {
 
 	public T visit(VarDecl varDecl);
 
-	public T visit(Contract contract);
+	public T visit(VarDef varDef);
 }
