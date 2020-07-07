@@ -17,12 +17,19 @@ allprojects {
     dependencies {
         compile name: 'antlr-runtime-4.4'
         compile name: 'jxl'
+        testImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
+        testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     }
 
     sourceSets {
         main {
             java {
                 srcDirs = ['../jkind-common/src']
+            }
+        }
+        test {
+            java {
+                srcDir '../jkind-common/test'
             }
         }
     }
