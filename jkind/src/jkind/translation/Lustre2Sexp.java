@@ -5,29 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import jkind.lustre.ArrayAccessExpr;
-import jkind.lustre.ArrayExpr;
-import jkind.lustre.ArrayUpdateExpr;
-import jkind.lustre.BinaryExpr;
-import jkind.lustre.BoolExpr;
-import jkind.lustre.CastExpr;
-import jkind.lustre.CondactExpr;
-import jkind.lustre.Equation;
-import jkind.lustre.Expr;
-import jkind.lustre.FunctionCallExpr;
-import jkind.lustre.IdExpr;
-import jkind.lustre.IfThenElseExpr;
-import jkind.lustre.IntExpr;
-import jkind.lustre.NamedType;
-import jkind.lustre.Node;
-import jkind.lustre.NodeCallExpr;
-import jkind.lustre.RealExpr;
-import jkind.lustre.RecordAccessExpr;
-import jkind.lustre.RecordExpr;
-import jkind.lustre.RecordUpdateExpr;
-import jkind.lustre.TupleExpr;
-import jkind.lustre.UnaryExpr;
-import jkind.lustre.VarDecl;
+import jkind.lustre.*;
 import jkind.lustre.visitors.ExprVisitor;
 import jkind.sexp.Cons;
 import jkind.sexp.Sexp;
@@ -207,6 +185,11 @@ public class Lustre2Sexp implements ExprVisitor<Sexp> {
 	@Override
 	public Sexp visit(IntExpr e) {
 		return Sexp.fromBigInt(e.value);
+	}
+
+	@Override
+	public Sexp visit(ModeRefExpr e) {
+		throw new IllegalArgumentException("JKind does not support mode references");
 	}
 
 	@Override
