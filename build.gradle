@@ -9,14 +9,23 @@ allprojects {
     apply plugin: 'java'
 
     repositories {
-       flatDir {
-           dirs '../jkind-common/dependencies'
-       }
+        flatDir {
+            dirs '../jkind-common/dependencies'
+        }
     }
 
     dependencies {
         compile name: 'antlr-runtime-4.4'
         compile name: 'jxl'
+    }
+}
+
+project(":jkind-common") {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
         testImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
         testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.6.2')
     }
@@ -24,14 +33,18 @@ allprojects {
     sourceSets {
         main {
             java {
-                srcDirs = ['../jkind-common/src']
+                srcDirs = ['src']
             }
         }
         test {
             java {
-                srcDir '../jkind-common/test'
+                srcDir 'test'
             }
         }
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }
 
@@ -43,6 +56,7 @@ project(':jkind') {
     }
 
     dependencies {
+        implementation project(':jkind-common')
         compile name: 'commons-cli-1.2'
         compile name: 'smtinterpol'
     }
@@ -91,6 +105,7 @@ project(':jkind-api') {
     }
 
     dependencies {
+        implementation project(':jkind-common')
         compile "org.eclipse.platform:org.eclipse.jface:3.12.2"
         compile "org.eclipse.platform:org.eclipse.swt:$swt_version"
     }
@@ -126,7 +141,7 @@ task dist(type: Zip) {
     version = match[0][1]
     assert version ==~ /[0-9.]+/
 }
- 
+
 artifacts {
     archives dist
 }

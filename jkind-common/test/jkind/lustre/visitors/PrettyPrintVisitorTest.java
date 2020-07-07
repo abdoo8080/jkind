@@ -1,3 +1,5 @@
+package jkind.lustre.visitors;
+
 import jkind.JKindException;
 import jkind.lustre.*;
 import jkind.lustre.builders.ContractBodyBuilder;
