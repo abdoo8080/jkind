@@ -7,7 +7,9 @@ buildscript {
 
 allprojects {
     apply plugin: 'java'
+}
 
+subprojects {
     repositories {
         flatDir {
             dirs '../jkind-common/dependencies'
@@ -56,7 +58,7 @@ project(':jkind') {
     }
 
     dependencies {
-        implementation project(':jkind-common')
+        compile project(':jkind-common')
         compile name: 'commons-cli-1.2'
         compile name: 'smtinterpol'
     }
@@ -105,7 +107,7 @@ project(':jkind-api') {
     }
 
     dependencies {
-        implementation project(':jkind-common')
+        compile project(':jkind-common')
         compile "org.eclipse.platform:org.eclipse.jface:3.12.2"
         compile "org.eclipse.platform:org.eclipse.swt:$swt_version"
     }

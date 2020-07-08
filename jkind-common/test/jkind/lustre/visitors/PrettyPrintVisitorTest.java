@@ -3,7 +3,6 @@ package jkind.lustre.visitors;
 import jkind.JKindException;
 import jkind.lustre.*;
 import jkind.lustre.builders.ContractBodyBuilder;
-import jkind.lustre.visitors.PrettyPrintVisitor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

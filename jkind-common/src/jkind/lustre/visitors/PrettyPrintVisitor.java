@@ -250,7 +250,6 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 			newline();
 			importedNode.contractBody.accept(this);
 			write("*)");
-			newline();
 		}
 
 		return null;
