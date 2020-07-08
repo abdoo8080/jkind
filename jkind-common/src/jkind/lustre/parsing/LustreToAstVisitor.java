@@ -20,7 +20,6 @@ import jkind.lustre.BoolExpr;
 import jkind.lustre.CastExpr;
 import jkind.lustre.CondactExpr;
 import jkind.lustre.Constant;
-import jkind.lustre.Contract;
 import jkind.lustre.ContractBody;
 import jkind.lustre.EnumType;
 import jkind.lustre.Equation;
