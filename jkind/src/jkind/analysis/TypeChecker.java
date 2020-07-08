@@ -425,7 +425,7 @@ public class TypeChecker implements ExprVisitor<Type> {
 
 	@Override
 	public Type visit(ModeRefExpr e) {
-		return null;
+		throw new IllegalArgumentException("JKind does not support mode references");
 	}
 
 	@Override

@@ -21,10 +21,10 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		sb.append(o);
 	}
 
-	private static final String seperator = System.getProperty("line.separator");
+	private static final String separator = System.getProperty("line.separator");
 
 	private void newline() {
-		write(seperator);
+		write(separator);
 	}
 
 	@Override
@@ -229,8 +229,7 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 	}
 
 	@Override
-	public Void visit(ImportedNode importedNode)
-	{
+	public Void visit(ImportedNode importedNode) {
 		write("node imported ");
 		write(importedNode.id);
 		write("(");
@@ -244,8 +243,7 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		write(");");
 		newline();
 
-		if (importedNode.contractBody != null)
-		{
+		if (importedNode.contractBody != null) {
 			write("(*@contract");
 			newline();
 			importedNode.contractBody.accept(this);
@@ -293,11 +291,9 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 
 		Iterator<Expr> inputIt = contractImport.inputs.iterator();
 
-		while (inputIt.hasNext())
-		{
+		while (inputIt.hasNext()) {
 			expr(inputIt.next());
-			if (inputIt.hasNext())
-			{
+			if (inputIt.hasNext()) {
 				write(", ");
 			}
 		}
@@ -305,11 +301,9 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		write(") returns (");
 
 		Iterator<Expr> outputIt = contractImport.outputs.iterator();
-		while (outputIt.hasNext())
-		{
+		while (outputIt.hasNext()) {
 			expr(outputIt.next());
-			if (outputIt.hasNext())
-			{
+			if (outputIt.hasNext()) {
 				write(", ");
 			}
 		}
@@ -486,8 +480,7 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 
 	@Override
 	public Void visit(ModeRefExpr e) {
-		for (String s : e.path)
-		{
+		for (String s : e.path) {
 			write("::");
 			write(s);
 		}
@@ -605,15 +598,13 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		write(mode.id);
 		write(" (");
 		newline();
-		for (Expr e : mode.require)
-		{
+		for (Expr e : mode.require) {
 			write("    require ");
 			expr(e);
 			write(";");
 			newline();
 		}
-		for (Expr e : mode.ensure)
-		{
+		for (Expr e : mode.ensure) {
 			write("    ensure  ");
 			expr(e);
 			write(";");

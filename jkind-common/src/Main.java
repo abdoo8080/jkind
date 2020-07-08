@@ -26,77 +26,6 @@ public class Main {
         System.out.println(program.build().toString());
     }
 
-    public static NodeBuilder even() {
-        NodeBuilder n = new NodeBuilder("Even");
-        IdExpr N = n.createInput("N", NamedType.INT);
-        IdExpr B = n.createOutput("B", NamedType.BOOL);
-        n.addEquation(B,
-                LustreUtil.equal(LustreUtil.mod(N, LustreUtil.integer(2)), LustreUtil.integer(0)));
-        return n;
-    }
-
-    public static NodeBuilder toInt() {
-        NodeBuilder n = new NodeBuilder("ToInt");
-        IdExpr X = n.createInput("X", NamedType.BOOL);
-        IdExpr N = n.createOutput("N", NamedType.INT);
-        n.addEquation(N, LustreUtil.ite(X, LustreUtil.integer(1), LustreUtil.integer(0)));
-        return n;
-    }
-
-    public static NodeBuilder count() {
-        NodeBuilder n = new NodeBuilder("Count");
-        IdExpr X = n.createInput("X", NamedType.BOOL);
-        IdExpr N = n.createOutput("N", NamedType.INT);
-        NodeCallExpr toIntX = new NodeCallExpr("ToInt", X);
-        n.addEquation(N, LustreUtil.arrow(toIntX, LustreUtil.plus(toIntX, LustreUtil.pre(N))));
-        return n;
-    }
-
-    public static NodeBuilder sofar() {
-        NodeBuilder n = new NodeBuilder("Sofar");
-        IdExpr X = n.createInput("X", NamedType.BOOL);
-        IdExpr Y = n.createOutput("Y", NamedType.BOOL);
-        n.addEquation(Y, LustreUtil.arrow(X, LustreUtil.and(X, LustreUtil.pre(Y))));
-        return n;
-    }
-
-    public static NodeBuilder since() {
-        NodeBuilder n = new NodeBuilder("Since");
-        IdExpr X = n.createInput("X", NamedType.BOOL);
-        IdExpr Y = n.createInput("Y", NamedType.BOOL);
-        IdExpr Z = n.createOutput("Z", NamedType.BOOL);
-        n.addEquation(Z, LustreUtil.or(X,
-                LustreUtil.and(Y, LustreUtil.arrow(LustreUtil.FALSE, LustreUtil.pre(Z)))));
-        return n;
-    }
-
-    public static NodeBuilder sinceIncl() {
-        NodeBuilder n = new NodeBuilder("SinceIncl");
-        IdExpr X = n.createInput("X", NamedType.BOOL);
-        IdExpr Y = n.createInput("Y", NamedType.BOOL);
-        IdExpr Z = n.createOutput("Z", NamedType.BOOL);
-        n.addEquation(Z, LustreUtil.and(Y,
-                LustreUtil.or(X, LustreUtil.arrow(LustreUtil.FALSE, LustreUtil.pre(Z)))));
-        return n;
-    }
-
-    public static NodeBuilder increased() {
-        NodeBuilder n = new NodeBuilder("Increased");
-        IdExpr N = n.createInput("N", NamedType.INT);
-        IdExpr B = n.createOutput("B", NamedType.BOOL);
-        n.addEquation(B,
-                LustreUtil.arrow(LustreUtil.TRUE, LustreUtil.greater(N, LustreUtil.pre(N))));
-        return n;
-    }
-
-    public static NodeBuilder stable() {
-        NodeBuilder n = new NodeBuilder("Stable");
-        IdExpr N = n.createInput("N", NamedType.INT);
-        IdExpr B = n.createOutput("B", NamedType.BOOL);
-        n.addEquation(B, LustreUtil.arrow(LustreUtil.TRUE, LustreUtil.equal(N, LustreUtil.pre(N))));
-        return n;
-    }
-
     public static Contract stopWatchSpec() {
         ContractBodyBuilder c = new ContractBodyBuilder();
 
@@ -184,6 +113,77 @@ public class Main {
                 Collections.singletonList(new VarDecl("r", NamedType.REAL)), c.build());
     }
 
+    public static NodeBuilder even() {
+        NodeBuilder n = new NodeBuilder("Even");
+        IdExpr N = n.createInput("N", NamedType.INT);
+        IdExpr B = n.createOutput("B", NamedType.BOOL);
+        n.addEquation(B,
+                LustreUtil.equal(LustreUtil.mod(N, LustreUtil.integer(2)), LustreUtil.integer(0)));
+        return n;
+    }
+
+    public static NodeBuilder toInt() {
+        NodeBuilder n = new NodeBuilder("ToInt");
+        IdExpr X = n.createInput("X", NamedType.BOOL);
+        IdExpr N = n.createOutput("N", NamedType.INT);
+        n.addEquation(N, LustreUtil.ite(X, LustreUtil.integer(1), LustreUtil.integer(0)));
+        return n;
+    }
+
+    public static NodeBuilder count() {
+        NodeBuilder n = new NodeBuilder("Count");
+        IdExpr X = n.createInput("X", NamedType.BOOL);
+        IdExpr N = n.createOutput("N", NamedType.INT);
+        NodeCallExpr toIntX = new NodeCallExpr("ToInt", X);
+        n.addEquation(N, LustreUtil.arrow(toIntX, LustreUtil.plus(toIntX, LustreUtil.pre(N))));
+        return n;
+    }
+
+    public static NodeBuilder sofar() {
+        NodeBuilder n = new NodeBuilder("Sofar");
+        IdExpr X = n.createInput("X", NamedType.BOOL);
+        IdExpr Y = n.createOutput("Y", NamedType.BOOL);
+        n.addEquation(Y, LustreUtil.arrow(X, LustreUtil.and(X, LustreUtil.pre(Y))));
+        return n;
+    }
+
+    public static NodeBuilder since() {
+        NodeBuilder n = new NodeBuilder("Since");
+        IdExpr X = n.createInput("X", NamedType.BOOL);
+        IdExpr Y = n.createInput("Y", NamedType.BOOL);
+        IdExpr Z = n.createOutput("Z", NamedType.BOOL);
+        n.addEquation(Z, LustreUtil.or(X,
+                LustreUtil.and(Y, LustreUtil.arrow(LustreUtil.FALSE, LustreUtil.pre(Z)))));
+        return n;
+    }
+
+    public static NodeBuilder sinceIncl() {
+        NodeBuilder n = new NodeBuilder("SinceIncl");
+        IdExpr X = n.createInput("X", NamedType.BOOL);
+        IdExpr Y = n.createInput("Y", NamedType.BOOL);
+        IdExpr Z = n.createOutput("Z", NamedType.BOOL);
+        n.addEquation(Z, LustreUtil.and(Y,
+                LustreUtil.or(X, LustreUtil.arrow(LustreUtil.FALSE, LustreUtil.pre(Z)))));
+        return n;
+    }
+
+    public static NodeBuilder increased() {
+        NodeBuilder n = new NodeBuilder("Increased");
+        IdExpr N = n.createInput("N", NamedType.INT);
+        IdExpr B = n.createOutput("B", NamedType.BOOL);
+        n.addEquation(B,
+                LustreUtil.arrow(LustreUtil.TRUE, LustreUtil.greater(N, LustreUtil.pre(N))));
+        return n;
+    }
+
+    public static NodeBuilder stable() {
+        NodeBuilder n = new NodeBuilder("Stable");
+        IdExpr N = n.createInput("N", NamedType.INT);
+        IdExpr B = n.createOutput("B", NamedType.BOOL);
+        n.addEquation(B, LustreUtil.arrow(LustreUtil.TRUE, LustreUtil.equal(N, LustreUtil.pre(N))));
+        return n;
+    }
+
     public static NodeBuilder stopWatch() {
         NodeBuilder n = new NodeBuilder("Stopwatch");
         IdExpr toggle = n.createInput("toggle", NamedType.BOOL);
@@ -191,12 +191,13 @@ public class Main {
         IdExpr count = n.createOutput("count", NamedType.INT);
 
         ContractBodyBuilder c = new ContractBodyBuilder();
-        c.addImport("StopWatchSpec", Arrays.asList(toggle, reset),
+        c.importContract("StopWatchSpec", Arrays.asList(toggle, reset),
                 Collections.singletonList(count));
 
-        c.addGuarantee(LustreUtil.or(LustreUtil.modeRef("StopWatchSpec", "resetting"),
-                LustreUtil.modeRef("StopWatchSpec", "running"),
-                LustreUtil.modeRef("StopWatchSpec", "stopped")));
+        c.addGuarantee(
+                LustreUtil.not(LustreUtil.and(LustreUtil.modeRef("StopWatchSpec", "resetting"),
+                        LustreUtil.modeRef("StopWatchSpec", "running"),
+                        LustreUtil.modeRef("StopWatchSpec", "stopped"))));
 
         n.setContractBody(c.build());
 
