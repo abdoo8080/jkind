@@ -1,1 +1,1 @@
-include 'jkind-common', 'jkind', 'jkind-api'
+include 'jkind'
