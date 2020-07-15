@@ -18,9 +18,10 @@ public class Node extends Ast {
 	public final List<String> realizabilityInputs; // Nullable
 	public final ContractBody contractBody; // Nullable
 
-	public Node(Location location, String id, List<VarDecl> inputs, List<VarDecl> outputs, List<VarDecl> locals,
-				List<Equation> equations, List<String> properties, List<Expr> assertions, List<String> realizabilityInputs,
-				ContractBody contractBody, List<String> ivc) {
+	public Node(Location location, String id, List<VarDecl> inputs, List<VarDecl> outputs,
+			List<VarDecl> locals, List<Equation> equations, List<String> properties,
+			List<Expr> assertions, List<String> realizabilityInputs, ContractBody contractBody,
+			List<String> ivc) {
 		super(location);
 		Assert.isNotNull(id);
 		this.id = id;
@@ -35,11 +36,11 @@ public class Node extends Ast {
 		this.contractBody = contractBody;
 	}
 
-	public Node(String id, List<VarDecl> inputs, List<VarDecl> outputs, List<VarDecl> locals, List<Equation> equations,
-			List<String> properties, List<Expr> assertions, List<String> realizabilityInputs, ContractBody contractBody,
-			List<String> ivc) {
-		this(Location.NULL, id, inputs, outputs, locals, equations, properties, assertions, realizabilityInputs,
-				contractBody, ivc);
+	public Node(String id, List<VarDecl> inputs, List<VarDecl> outputs, List<VarDecl> locals,
+			List<Equation> equations, List<String> properties, List<Expr> assertions,
+			List<String> realizabilityInputs, ContractBody contractBody, List<String> ivc) {
+		this(Location.NULL, id, inputs, outputs, locals, equations, properties, assertions,
+				realizabilityInputs, contractBody, ivc);
 	}
 
 	@Override

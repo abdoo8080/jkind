@@ -3,6 +3,7 @@ package jkind.lustre.visitors;
 import java.util.List;
 
 import jkind.lustre.*;
+import jkind.util.Util;
 
 public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, Void> {
 	@Override
@@ -25,6 +26,16 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	}
 
 	@Override
+	public Void visit(Kind2Function e) {
+		visitVarDecls(e.inputs);
+		visitVarDecls(e.outputs);
+		visitVarDecls(e.locals);
+		visitEquations(e.equations);
+		visitAssertions(e.assertions);
+		return null;
+	}
+
+	@Override
 	public Void visit(Node e) {
 		visitVarDecls(e.inputs);
 		visitVarDecls(e.outputs);
@@ -35,9 +46,18 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	}
 
 	@Override
+	public Void visit(ImportedFunction e) {
+		visitVarDecls(e.inputs);
+		visitVarDecls(e.outputs);
+		// visit(e.contractBody);
+		return null;
+	}
+
+	@Override
 	public Void visit(ImportedNode e) {
 		visitVarDecls(e.inputs);
 		visitVarDecls(e.outputs);
+		// visit(e.contractBody);
 		return null;
 	}
 
@@ -61,9 +81,11 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	public Void visit(Program e) {
 		visitTypeDefs(e.types);
 		visitConstants(e.constants);
-		// visitContracts(e.contracts);
 		visitFunctions(e.functions);
+		// visitImportedFunctions(e.importedFunctions);
 		// visitImportedNodes(e.importedNodes);
+		// visitContracts(e.contracts);
+		// visitKind2Functions(e.kind2Functions);
 		visitNodes(e.nodes);
 		return null;
 	}
@@ -80,20 +102,32 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 		}
 	}
 
-	protected void visitContracts(List<Contract> es) {
-		for (Contract e : es) {
-			visit(e);
-		}
-	}
-
 	protected void visitFunctions(List<Function> es) {
 		for (Function e : es) {
 			visit(e);
 		}
 	}
 
+	protected void visitImportedFunctions(List<ImportedFunction> es) {
+		for (ImportedFunction e : es) {
+			visit(e);
+		}
+	}
+
 	protected void visitImportedNodes(List<ImportedNode> es) {
 		for (ImportedNode e : es) {
+			visit(e);
+		}
+	}
+
+	protected void visitContracts(List<Contract> es) {
+		for (Contract e : es) {
+			visit(e);
+		}
+	}
+
+	protected void visitKind2Functions(List<Kind2Function> es) {
+		for (Kind2Function e : es) {
 			visit(e);
 		}
 	}
@@ -141,7 +175,7 @@ public class AstIterVisitor extends ExprIterVisitor implements AstVisitor<Void, 
 	@Override
 	public Void visit(ContractImport contractImport) {
 		visitExprs(contractImport.inputs);
-		visitExprs(contractImport.outputs);
+		visitExprs(Util.safeList(contractImport.outputs));
 		return null;
 	}
 

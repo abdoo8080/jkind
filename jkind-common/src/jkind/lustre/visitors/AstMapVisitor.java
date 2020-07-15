@@ -1,8 +1,8 @@
 package jkind.lustre.visitors;
 
 import jkind.lustre.*;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Expr> {
 	@Override
@@ -24,21 +24,47 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 	}
 
 	@Override
+	public Kind2Function visit(Kind2Function e) {
+		List<VarDecl> inputs = visitVarDecls(e.inputs);
+		List<VarDecl> outputs = visitVarDecls(e.outputs);
+		ContractBody contractBody = null;
+		if (e.contractBody != null) {
+			contractBody = visit(e.contractBody);
+		}
+		List<VarDecl> locals = visitVarDecls(e.locals);
+		List<Equation> equations = visitEquations(e.equations);
+		List<Expr> assertions = visitAssertions(e.assertions);
+		List<String> properties = visitProperties(e.properties);
+		return new Kind2Function(e.location, e.id, inputs, outputs, contractBody, locals, equations,
+				assertions, properties);
+	}
+
+	@Override
 	public Node visit(Node e) {
 		List<VarDecl> inputs = visitVarDecls(e.inputs);
 		List<VarDecl> outputs = visitVarDecls(e.outputs);
+		// ContractBody contractBody = null;
+		// if (e.contractBody != null) {
+		// contractBody = visit(e.contractBody);
+		// }
 		List<VarDecl> locals = visitVarDecls(e.locals);
 		List<Equation> equations = visitEquations(e.equations);
 		List<Expr> assertions = visitAssertions(e.assertions);
 		List<String> properties = visitProperties(e.properties);
 		List<String> ivc = visitIvc(e.ivc);
 		List<String> realizabilityInputs = visitRealizabilityInputs(e.realizabilityInputs);
+		return new Node(e.location, e.id, inputs, outputs, locals, equations, properties,
+				assertions, realizabilityInputs, e.contractBody, ivc);
+	}
+
+	public ImportedFunction visit(ImportedFunction e) {
+		List<VarDecl> inputs = visitVarDecls(e.inputs);
+		List<VarDecl> outputs = visitVarDecls(e.outputs);
 		ContractBody contractBody = null;
 		if (e.contractBody != null) {
 			contractBody = visit(e.contractBody);
 		}
-		return new Node(e.location, e.id, inputs, outputs, locals, equations, properties,
-				assertions, realizabilityInputs, contractBody, ivc);
+		return new ImportedFunction(e.location, e.id, inputs, outputs, contractBody);
 	}
 
 	public ImportedNode visit(ImportedNode e) {
@@ -94,12 +120,15 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 	public Program visit(Program e) {
 		List<TypeDef> types = visitTypeDefs(e.types);
 		List<Constant> constants = visitConstants(e.constants);
-		// List<Contract> contracts = visitContracts(e.contracts);
 		List<Function> functions = visitFunctions(e.functions);
+		// List<ImportedFunction> importedFunctions = visitImportedFunctions(e.importedFunctions);
 		// List<ImportedNode> importedNodes = visitImportedNodes(e.importedNodes);
+		// List<Contract> contracts = visitContracts(e.contracts);
+		// List<Kind2Function> kind2Functions = visitKind2Functions(e.kind2Functions);
+
 		List<Node> nodes = visitNodes(e.nodes);
-		return new Program(e.location, types, constants, e.contracts, functions, e.importedNodes,
-				nodes, e.main);
+		return new Program(e.location, types, constants, functions, e.importedFunctions,
+				e.importedNodes, e.contracts, e.kind2Functions, nodes, e.main);
 	}
 
 	protected List<TypeDef> visitTypeDefs(List<TypeDef> es) {
@@ -110,11 +139,19 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 		return map(this::visit, es);
 	}
 
-	protected List<Contract> visitContracts(List<Contract> es) {
+	protected List<ImportedFunction> visitImportedFunctions(List<ImportedFunction> es) {
 		return map(this::visit, es);
 	}
 
 	protected List<ImportedNode> visitImportedNodes(List<ImportedNode> es) {
+		return map(this::visit, es);
+	}
+
+	protected List<Contract> visitContracts(List<Contract> es) {
+		return map(this::visit, es);
+	}
+
+	protected List<Kind2Function> visitKind2Functions(List<Kind2Function> es) {
 		return map(this::visit, es);
 	}
 
@@ -175,7 +212,8 @@ public class AstMapVisitor extends ExprMapVisitor implements AstVisitor<Ast, Exp
 	@Override
 	public ContractImport visit(ContractImport contractImport) {
 		return new ContractImport(contractImport.location, contractImport.id,
-				visitExprs(contractImport.inputs), visitExprs(contractImport.outputs));
+				visitExprs(contractImport.inputs), visitExprs(contractImport.outputs).stream()
+						.map(e -> (IdExpr) e).collect(Collectors.toList()));
 	}
 
 	@Override

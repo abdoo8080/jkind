@@ -9,10 +9,12 @@ import jkind.lustre.*;
 public class ProgramBuilder {
 	private List<TypeDef> types = new ArrayList<>();
 	private List<Constant> constants = new ArrayList<>();
-	private List<Contract> contracts = new ArrayList<>();
-	private List<ImportedNode> importedNodes = new ArrayList<>();
-	private List<Node> nodes = new ArrayList<>();
 	private List<Function> functions = new ArrayList<>();
+	private List<ImportedFunction> importedFunctions = new ArrayList<>();
+	private List<ImportedNode> importedNodes = new ArrayList<>();
+	private List<Contract> contracts = new ArrayList<>();
+	private List<Kind2Function> kind2Functions = new ArrayList<>();
+	private List<Node> nodes = new ArrayList<>();
 	private String main;
 
 	public ProgramBuilder() {
@@ -21,10 +23,12 @@ public class ProgramBuilder {
 	public ProgramBuilder(Program program) {
 		this.types = new ArrayList<>(program.types);
 		this.constants = new ArrayList<>(program.constants);
-		this.contracts = new ArrayList<>(program.contracts);
-		this.importedNodes = new ArrayList<>(program.importedNodes);
-		this.nodes = new ArrayList<>(program.nodes);
 		this.functions = new ArrayList<>(program.functions);
+		this.importedFunctions = new ArrayList<>(program.importedFunctions);
+		this.importedNodes = new ArrayList<>(program.importedNodes);
+		this.contracts = new ArrayList<>(program.contracts);
+		this.kind2Functions = new ArrayList<>(program.kind2Functions);
+		this.nodes = new ArrayList<>(program.nodes);
 		this.main = program.main;
 	}
 
@@ -58,18 +62,18 @@ public class ProgramBuilder {
 		return this;
 	}
 
-	public ProgramBuilder addContract(Contract contract) {
-		this.contracts.add(contract);
+	public ProgramBuilder addImportedFunction(ImportedFunction importedFunction) {
+		this.importedFunctions.add(importedFunction);
 		return this;
 	}
 
-	public ProgramBuilder addContracts(Collection<Contract> contracts) {
-		this.contracts.addAll(contracts);
+	public ProgramBuilder addImportedFunctions(Collection<ImportedFunction> importedFunctions) {
+		this.importedFunctions.addAll(importedFunctions);
 		return this;
 	}
 
-	public ProgramBuilder clearContracts() {
-		this.contracts.clear();
+	public ProgramBuilder clearImportedFunctions() {
+		this.importedFunctions.clear();
 		return this;
 	}
 
@@ -85,6 +89,36 @@ public class ProgramBuilder {
 
 	public ProgramBuilder clearImportedNodes() {
 		this.importedNodes.clear();
+		return this;
+	}
+
+	public ProgramBuilder addContract(Contract contract) {
+		this.contracts.add(contract);
+		return this;
+	}
+
+	public ProgramBuilder addContracts(Collection<Contract> contracts) {
+		this.contracts.addAll(contracts);
+		return this;
+	}
+
+	public ProgramBuilder clearContracts() {
+		this.contracts.clear();
+		return this;
+	}
+
+	public ProgramBuilder addKind2Function(Kind2Function kind2Function) {
+		this.kind2Functions.add(kind2Function);
+		return this;
+	}
+
+	public ProgramBuilder addKind2Functions(Collection<Kind2Function> kind2Functions) {
+		this.kind2Functions.addAll(kind2Functions);
+		return this;
+	}
+
+	public ProgramBuilder clearKind2Function() {
+		this.kind2Functions.clear();
 		return this;
 	}
 
@@ -124,6 +158,7 @@ public class ProgramBuilder {
 	}
 
 	public Program build() {
-		return new Program(Location.NULL, types, constants, contracts, functions, importedNodes, nodes, main);
+		return new Program(Location.NULL, types, constants, functions, importedFunctions,
+				importedNodes, contracts, kind2Functions, nodes, main);
 	}
 }

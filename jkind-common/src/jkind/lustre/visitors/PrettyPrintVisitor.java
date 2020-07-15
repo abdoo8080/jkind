@@ -55,9 +55,9 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 			newline();
 		}
 
-		if (!program.contracts.isEmpty()) {
-			for (Contract contract : program.contracts) {
-				contract.accept(this);
+		if (!program.importedFunctions.isEmpty()) {
+			for (ImportedFunction importedFunction : program.importedFunctions) {
+				importedFunction.accept(this);
 				newline();
 			}
 			newline();
@@ -68,6 +68,18 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 				importedNode.accept(this);
 				newline();
 			}
+			newline();
+		}
+
+		for (Contract contract : program.contracts) {
+			contract.accept(this);
+			newline();
+			newline();
+		}
+
+		for (Kind2Function kind2Function : program.kind2Functions) {
+			kind2Function.accept(this);
+			newline();
 			newline();
 		}
 
@@ -152,6 +164,70 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 	}
 
 	@Override
+	public Void visit(Kind2Function kind2Function) {
+		write("function ");
+		write(kind2Function.id);
+		write("(");
+		newline();
+		varDecls(kind2Function.inputs);
+		newline();
+		write(") returns (");
+		newline();
+		varDecls(kind2Function.outputs);
+		newline();
+		write(");");
+		newline();
+
+		if (kind2Function.contractBody != null) {
+			write("(*@contract");
+			newline();
+			kind2Function.contractBody.accept(this);
+			write("*)");
+			newline();
+		}
+
+		if (!kind2Function.locals.isEmpty()) {
+			write("var");
+			newline();
+			varDecls(kind2Function.locals);
+			write(";");
+			newline();
+		}
+		write("let");
+		newline();
+
+		if (kind2Function.id.equals(main)) {
+			write("  --%MAIN;");
+			newline();
+		}
+
+		for (Equation equation : kind2Function.equations) {
+			write("  ");
+			equation.accept(this);
+			newline();
+		}
+
+		if (!kind2Function.assertions.isEmpty()) {
+			newline();
+			for (Expr assertion : kind2Function.assertions) {
+				assertion(assertion);
+				newline();
+			}
+		}
+
+		if (!kind2Function.properties.isEmpty()) {
+			newline();
+			for (String property : kind2Function.properties) {
+				property(property);
+				newline();
+			}
+		}
+
+		write("tel;");
+		return null;
+	}
+
+	@Override
 	public Void visit(Node node) {
 		write("node ");
 		write(node.id);
@@ -204,8 +280,8 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		if (!node.properties.isEmpty()) {
 			for (String property : node.properties) {
 				property(property);
+				newline();
 			}
-			newline();
 		}
 
 		if (node.realizabilityInputs != null) {
@@ -225,6 +301,31 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		}
 
 		write("tel;");
+		return null;
+	}
+
+	@Override
+	public Void visit(ImportedFunction importedFunction) {
+		write("function imported ");
+		write(importedFunction.id);
+		write("(");
+		newline();
+		varDecls(importedFunction.inputs);
+		newline();
+		write(") returns (");
+		newline();
+		varDecls(importedFunction.outputs);
+		newline();
+		write(");");
+		newline();
+
+		if (importedFunction.contractBody != null) {
+			write("(*@contract");
+			newline();
+			importedFunction.contractBody.accept(this);
+			write("*)");
+		}
+
 		return null;
 	}
 
@@ -300,7 +401,7 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 
 		write(") returns (");
 
-		Iterator<Expr> outputIt = contractImport.outputs.iterator();
+		Iterator<IdExpr> outputIt = contractImport.outputs.iterator();
 		while (outputIt.hasNext()) {
 			expr(outputIt.next());
 			if (outputIt.hasNext()) {
@@ -344,7 +445,6 @@ public class PrettyPrintVisitor implements AstVisitor<Void, Void> {
 		write("  --%PROPERTY ");
 		write(s);
 		write(";");
-		newline();
 	}
 
 	public void expr(Expr e) {

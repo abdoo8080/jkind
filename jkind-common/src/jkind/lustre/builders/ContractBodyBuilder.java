@@ -207,7 +207,8 @@ public class ContractBodyBuilder {
 	 * @param outputs outputs of the contract
 	 * @return this contract body builder
 	 */
-	public ContractBodyBuilder importContract(String name, List<Expr> inputs, List<Expr> outputs) {
+	public ContractBodyBuilder importContract(String name, List<Expr> inputs,
+			List<IdExpr> outputs) {
 		this.items.add(new ContractImport(name, inputs, outputs));
 		return this;
 	}

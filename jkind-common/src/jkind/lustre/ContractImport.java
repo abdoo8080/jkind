@@ -22,7 +22,7 @@ import java.util.List;
 public class ContractImport extends ContractItem {
 	public final String id;
 	public final List<Expr> inputs;
-	public final List<Expr> outputs;
+	public final List<IdExpr> outputs;
 
 	/**
 	 * Constructor
@@ -32,7 +32,7 @@ public class ContractImport extends ContractItem {
 	 * @param inputs   inputs to the contract
 	 * @param outputs  outputs of the contract
 	 */
-	public ContractImport(Location loc, String id, List<Expr> inputs, List<Expr> outputs) {
+	public ContractImport(Location loc, String id, List<Expr> inputs, List<IdExpr> outputs) {
 		super(loc);
 		Assert.isNotNull(id);
 		this.id = id;
@@ -47,7 +47,7 @@ public class ContractImport extends ContractItem {
 	 * @param inputs  inputs of the contract
 	 * @param outputs outputs of the contract
 	 */
-	public ContractImport(String id, List<Expr> inputs, List<Expr> outputs) {
+	public ContractImport(String id, List<Expr> inputs, List<IdExpr> outputs) {
 		this(Location.NULL, id, inputs, outputs);
 	}
 

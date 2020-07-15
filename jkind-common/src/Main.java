@@ -1,5 +1,6 @@
 import jkind.lustre.*;
 import jkind.lustre.builders.ContractBodyBuilder;
+import jkind.lustre.builders.Kind2FunctionBuilder;
 import jkind.lustre.builders.NodeBuilder;
 import jkind.lustre.builders.ProgramBuilder;
 
@@ -11,10 +12,10 @@ public class Main {
 	public static void main(String[] args) {
 		ProgramBuilder program = new ProgramBuilder();
 
+		program.addImportedFunction(sqrt());
 		program.addContract(stopWatchSpec());
-		program.addImportedNode(sqrt());
-		program.addNode(even().build());
-		program.addNode(toInt().build());
+		program.addKind2Function(even().build());
+		program.addKind2Function(toInt().build());
 		program.addNode(count().build());
 		program.addNode(sofar().build());
 		program.addNode(since().build());
@@ -24,6 +25,20 @@ public class Main {
 		program.addNode(stopWatch().build());
 
 		System.out.println(program.build().toString());
+	}
+
+	public static ImportedFunction sqrt() {
+		IdExpr n = new IdExpr("n");
+		IdExpr r = new IdExpr("r");
+
+		ContractBodyBuilder c = new ContractBodyBuilder();
+		c.addAssumption(LustreUtil.greaterEqual(n, LustreUtil.real("0.0")));
+		c.addGuarantee(LustreUtil.and(LustreUtil.greaterEqual(r, LustreUtil.real("0.0")),
+				LustreUtil.equal(LustreUtil.multiply(r, r), n)));
+
+		return new ImportedFunction("sqrt",
+				Collections.singletonList(new VarDecl("n", NamedType.REAL)),
+				Collections.singletonList(new VarDecl("r", NamedType.REAL)), c.build());
 	}
 
 	public static Contract stopWatchSpec() {
@@ -100,34 +115,21 @@ public class Main {
 		return new Contract("StopWatchSpec", inputs, outputs, c.build());
 	}
 
-	public static ImportedNode sqrt() {
-		IdExpr n = new IdExpr("n");
-		IdExpr r = new IdExpr("r");
-
-		ContractBodyBuilder c = new ContractBodyBuilder();
-		c.addAssumption(LustreUtil.greaterEqual(n, LustreUtil.real("0.0")));
-		c.addGuarantee(LustreUtil.and(LustreUtil.greaterEqual(r, LustreUtil.real("0.0")),
-				LustreUtil.equal(LustreUtil.multiply(r, r), n)));
-
-		return new ImportedNode("sqrt", Collections.singletonList(new VarDecl("n", NamedType.REAL)),
-				Collections.singletonList(new VarDecl("r", NamedType.REAL)), c.build());
-	}
-
-	public static NodeBuilder even() {
-		NodeBuilder n = new NodeBuilder("Even");
-		IdExpr N = n.createInput("N", NamedType.INT);
-		IdExpr B = n.createOutput("B", NamedType.BOOL);
-		n.addEquation(B,
+	public static Kind2FunctionBuilder even() {
+		Kind2FunctionBuilder f = new Kind2FunctionBuilder("even");
+		IdExpr N = f.createInput("N", NamedType.INT);
+		IdExpr B = f.createOutput("B", NamedType.BOOL);
+		f.addEquation(B,
 				LustreUtil.equal(LustreUtil.mod(N, LustreUtil.integer(2)), LustreUtil.integer(0)));
-		return n;
+		return f;
 	}
 
-	public static NodeBuilder toInt() {
-		NodeBuilder n = new NodeBuilder("ToInt");
-		IdExpr X = n.createInput("X", NamedType.BOOL);
-		IdExpr N = n.createOutput("N", NamedType.INT);
-		n.addEquation(N, LustreUtil.ite(X, LustreUtil.integer(1), LustreUtil.integer(0)));
-		return n;
+	public static Kind2FunctionBuilder toInt() {
+		Kind2FunctionBuilder f = new Kind2FunctionBuilder("toInt");
+		IdExpr X = f.createInput("X", NamedType.BOOL);
+		IdExpr N = f.createOutput("N", NamedType.INT);
+		f.addEquation(N, LustreUtil.ite(X, LustreUtil.integer(1), LustreUtil.integer(0)));
+		return f;
 	}
 
 	public static NodeBuilder count() {

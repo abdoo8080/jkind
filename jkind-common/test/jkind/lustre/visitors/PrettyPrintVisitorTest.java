@@ -3,6 +3,7 @@ package jkind.lustre.visitors;
 import jkind.JKindException;
 import jkind.lustre.*;
 import jkind.lustre.builders.ContractBodyBuilder;
+import jkind.lustre.builders.Kind2FunctionBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -136,7 +137,7 @@ class PrettyPrintVisitorTest {
 	}
 
 	@Test
-	void ContractBodyTest() {
+	void contractBodyTest() {
 		// raw strings require Java 12+
 		String expected = "guarantee true; assume true; import Spec() returns ();"
 				+ "mode m(); const c = true; var x : bool = true;";
@@ -159,7 +160,7 @@ class PrettyPrintVisitorTest {
 	}
 
 	@Test
-	void ContractTest() {
+	void contractTest() {
 		// raw strings require Java 12+
 		String expected = "contract c() returns (); let guarantee true; tel;";
 
@@ -179,7 +180,31 @@ class PrettyPrintVisitorTest {
 	}
 
 	@Test
-	void ImportedNodeTest() {
+	void importedFunctionTest() {
+		Assertions.assertThrows(JKindException.class,
+				() -> new ImportedFunction(null, null, null, null));
+
+		String expected = "function imported f() returns ();";
+
+		PrettyPrintVisitor visitor = new PrettyPrintVisitor();
+		visitor.visit(new ImportedFunction("f", null, null, null));
+
+		assertEquals(removeWhiteSpace(visitor.toString()), removeWhiteSpace(expected));
+
+		// raw strings require Java 12+
+		expected = "function imported f() returns (); (*@contract guarantee true; *)";
+
+		ContractBodyBuilder c = new ContractBodyBuilder();
+		c.addGuarantee(LustreUtil.TRUE);
+
+		visitor = new PrettyPrintVisitor();
+		visitor.visit(new ImportedFunction("f", null, null, c.build()));
+
+		assertEquals(removeWhiteSpace(visitor.toString()), removeWhiteSpace(expected));
+	}
+
+	@Test
+	void importedNodeTest() {
 		Assertions.assertThrows(JKindException.class,
 				() -> new ImportedNode(null, null, null, null));
 
@@ -198,6 +223,41 @@ class PrettyPrintVisitorTest {
 
 		visitor = new PrettyPrintVisitor();
 		visitor.visit(new ImportedNode("n", null, null, c.build()));
+
+		assertEquals(removeWhiteSpace(visitor.toString()), removeWhiteSpace(expected));
+	}
+
+	@Test
+	void kind2FunctionTest() {
+		Assertions.assertThrows(JKindException.class,
+				() -> new Kind2Function(null, null, null, null, null, null, null, null));
+
+		Kind2FunctionBuilder f = new Kind2FunctionBuilder("even");
+
+		IdExpr N = f.createInput("N", NamedType.INT);
+		IdExpr B = f.createOutput("B", NamedType.BOOL);
+		f.addEquation(B,
+				LustreUtil.equal(LustreUtil.mod(N, LustreUtil.integer(2)), LustreUtil.integer(0)));
+
+		String expected =
+				"function even(N : int) returns (B : bool); let B = ((N mod 2) = 0); tel;";
+
+		PrettyPrintVisitor visitor = new PrettyPrintVisitor();
+		visitor.visit(f.build());
+
+		assertEquals(removeWhiteSpace(visitor.toString()), removeWhiteSpace(expected));
+
+		// raw strings require Java 12+
+		expected = "function even(N : int) returns (B : bool); (*@contract guarantee true; *)"
+				+ "let B = ((N mod 2) = 0); tel;";
+
+		ContractBodyBuilder c = new ContractBodyBuilder();
+		c.addGuarantee(LustreUtil.TRUE);
+
+		f.setContractBody(c.build());
+
+		visitor = new PrettyPrintVisitor();
+		visitor.visit(f.build());
 
 		assertEquals(removeWhiteSpace(visitor.toString()), removeWhiteSpace(expected));
 	}

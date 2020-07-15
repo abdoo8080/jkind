@@ -19,7 +19,11 @@ public interface AstVisitor<T, S extends T> extends ExprVisitor<S> {
 
 	public T visit(Guarantee guarantee);
 
+	public T visit(ImportedFunction importedFunction);
+
 	public T visit(ImportedNode importedNode);
+
+	public T visit(Kind2Function kind2Function);
 
 	public T visit(Mode mode);
 
